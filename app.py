@@ -1,4 +1,5 @@
 from flask import Flask, render_template, make_response, abort
+import smtplib
 
 app = Flask(__name__)
 
@@ -38,3 +39,18 @@ def error_not_found():
 @app.errorhandler(404)
 def not_found_error(error):
     return render_template('404.html'), 404
+
+@app.route('/form', methods=["POST"])
+def form():
+    email = request.form.get("email")
+    description = request.form.get("description")
+
+    message = "You have message"
+    server = smtplib.SMTP("smtp-mail.outlook.com", 587)
+    server.starttls()
+    server.login("address@email.com", "")
+    server.sendmail("address@email.com", email, message, description)
+
+    if not email or not description:
+        error_statement = "All form fields required..."
+        return return_template('contact.html')
